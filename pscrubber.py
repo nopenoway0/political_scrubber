@@ -5,6 +5,7 @@ import url_creator
 import re
 from os import remove
 import pdf_converter
+# TODO: increase robustness of name selection over jobs. For example, USAF being recognized as a name
 # TODO: not writing GOVERNOR job in candidates1.pdf
 # check for recent elections
 # check candidates in recent elections

@@ -1,3 +1,4 @@
+# use an sio object to extract information
 from url_creator import ScraperInfoObject
 from bs4 import BeautifulSoup
 import re

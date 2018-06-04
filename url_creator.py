@@ -1,5 +1,6 @@
 # warning Arizona is currently broken
 # Stopped at colorado website
+# TODO: create adaptable SIOs
 class URLCreator:
 	year = 2018
 	state_mappings = {"california": "http://www.sos.ca.gov",
