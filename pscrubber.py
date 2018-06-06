@@ -87,7 +87,7 @@ with open('candidates.txt', 'w') as f:
 			if jobs.get(candidate, True):
 				f.write(candidate + '\n')
 			else:
-				f.write(' ' * 10 + candidate + ' ' * 10 + '\n')
+				f.write(' ' * 10 + candidate + ' ' * 10 + '\t' + '\n')
 
 # cleanup
 for name in filenames:
