@@ -5,6 +5,8 @@ import url_creator
 import re
 from os import remove
 import pdf_converter
+import logging
+
 # TODO: increase robustness of name selection over jobs. For example, USAF being recognized as a name
 # TODO: not writing GOVERNOR job in candidates1.pdf
 # check for recent elections
@@ -12,6 +14,20 @@ import pdf_converter
 # gather information on current standing for the said candidate
 # present it to user based on their location, they can also type in their zip code
 
+# set all logging parameters
+log = logging.getLogger('scrubber_log')
+debug_log = logging.getLogger('dscrubber_log')
+log.setLevel(logging.INFO)
+debug_log.setLevel(logging.DEBUG)
+
+ch = logging.StreamHandler()
+ch.setLevel(logging.INFO)
+
+fh = logging.FileHandler('scrubber_log.txt', 'w')
+fh.setLevel(logging.DEBUG)
+
+log.addHandler(ch)
+debug_log.addHandler(fh)
 
 jobs = {"STATE ASSEMBLY MEMBER": False, 
 'STATE SENATOR DISTRICT' : False,  'GOVERNOR' : False, 'LIEUTENANT GOVERNOR' : False,
@@ -57,7 +73,7 @@ for result in results:
 # parse through to get the candidate links for each election using dedicates sio candidate object
 candidate_links = []
 for link in links:
-	print ("link: " + link)
+	log.info("link: " + link)
 	html = requests.get(link)
 	soup = BeautifulSoup(html.text, "html.parser")
 	candidate_links.append(ext.extract_information(sio_candidate, soup))
@@ -66,7 +82,7 @@ del links, html, soup, results, sio, sio_candidate, ext
 # get pdf or html from each candidate link
 counter, filenames = 1, []
 for link in candidate_links:
-	print ('downloading candidate information from: ',  link)
+	log.info('downloading candidate information from: ' +  link)
 	contents = requests.get(link)
 	with open('candidate' + str(counter) + '.pdf', 'wb') as file:
 		file.write(contents.content)
@@ -75,11 +91,12 @@ for link in candidate_links:
 with open('candidates.txt', 'w') as f:
 # get names from file
 	for name in filenames:
-		print ('converting ', name, ' to text')
+		log.info('converting ' + name + ' to text')
 		text = pdf_converter.convert_pdf_to_txt(name)
-		print('\textracting candidates')
+		debug_log.debug(text)
+		log.info('\textracting candidates')
 		candidates = re.findall(r'\n*([A-Z\.][A-Z\.\"]+[ ]+[ \.\"]*[A-Z\"\-\(\)\']+[ \.]*[A-Z\"\-]*)+[\n\*]*?', text)
-		print('\textracting election name')
+		log.info('\textracting election name')
 		election = re.search(r'[\f]+(.*?)[\r\n]+', text).group(1)
 		# write name and election to file
 		f.write('-' * 10 + election + '-' * 10 + '\n')
@@ -91,5 +108,5 @@ with open('candidates.txt', 'w') as f:
 
 # cleanup
 for name in filenames:
-	print('deleting ', name)
+	log.info('deleting ' + name)
 	remove(name)
