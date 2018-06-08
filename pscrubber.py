@@ -50,6 +50,7 @@ sio = cr.create_sio('california', req_type = 'election')
 sio_candidate = cr.create_sio('california', req_type = 'candidate')
 
 # extract links for page using designated sio object and html from homepage
+# TODO: increase robustness. updated page breaks california extraction
 results, links = ext.extract_information(sio, soup), []
 #print (results)
 
@@ -95,7 +96,8 @@ with open('candidates.txt', 'w') as f:
 		text = pdf_converter.convert_pdf_to_txt(name)
 		debug_log.debug(text)
 		log.info('\textracting candidates')
-		candidates = re.findall(r'\n*([A-Z\.][A-Z\.\"]+[ ]+[ \.\"]*[A-Z\"\-\(\)\']+[ \.]*[A-Z\"\-]*)+[\n\*]*?', text)
+		#candidates = re.findall(r'\n*([A-Z\.][A-Z\.\"]+[ ]*[ \.\"]*[A-Z\"\-\(\)\']*[ \.]*[A-Z\"\-]*)+\*?\n', text)
+		candidates = re.findall(r'[\n ]*([A-Z][A-Z \*\.]+?)[\d ]*\n', text)
 		log.info('\textracting election name')
 		election = re.search(r'[\f]+(.*?)[\r\n]+', text).group(1)
 		# write name and election to file
